@@ -19,10 +19,6 @@ impl Snake {
         Self { body, direction, just_eaten: false }
     }
 
-    pub fn len(&self) -> usize {
-        self.body.len()
-    }
-
     pub fn get_head_point(&self) -> Point {
         self.body.first().unwrap().clone()
     }

@@ -11,8 +11,9 @@ use crossterm::event::{poll, read, Event, KeyCode};
 use crate::command::Command;
 use rand::Rng;
 
-const BASE_INTERVAL_MS: u64 = 1000;
-const MAX_SPEED: u64 = 20;
+const MAX_INTERVAL: u16 = 750;
+const MIN_INTERVAL: u16 = 200;
+const MAX_SPEED: u16 = 20;
 
 #[derive(Debug)]
 pub struct Game {
@@ -22,7 +23,8 @@ pub struct Game {
     height: u16,
     food: Option<Point>,
     snake: Snake,
-    speed: u8,
+    speed: u16,
+    score: u16,
 }
 
 impl Game {
@@ -42,28 +44,27 @@ impl Game {
                     1 => Direction::Right,
                     2 => Direction::Down,
                     _ => Direction::Left
-                }
+                },
             ),
-            speed: 10,
+            speed: 0,
+            score: 0,
         }
     }
 
     pub fn run(&mut self) {
-        self.prepare_ui();
         self.place_food();
+        self.prepare_ui();
+        self.render();
 
         let mut done = false;
+        let speed_increase_mod = (self.width * self.height) / MAX_SPEED;
         while !done {
-            let now = Instant::now();
             let interval = self.calculate_interval();
             let direction = self.snake.get_direction();
+            let now = Instant::now();
+            let mut elapsed = now.elapsed();
 
-            loop {
-                let elapsed = now.elapsed();
-                if elapsed >= interval {
-                    break;
-                }
-
+            while elapsed < interval {
                 if let Some(command) = self.get_command(interval - elapsed) {
                     match command {
                         Command::Quit => {
@@ -77,6 +78,8 @@ impl Game {
                         }
                     }
                 }
+
+                elapsed = now.elapsed();
             }
 
             if self.has_collided_with_wall() || self.has_bitten_itself() {
@@ -88,6 +91,12 @@ impl Game {
                     if self.snake.get_head_point() == food_point {
                         self.snake.grow();
                         self.place_food();
+                        self.score += 1;
+
+
+                        if self.score % speed_increase_mod == 0 {
+                            self.speed += 1;
+                        }
                     }
                 }
 
@@ -97,7 +106,7 @@ impl Game {
 
         self.restore_ui();
 
-        println!("Game Over! Your score is {}", self.snake.len());
+        println!("Game Over! Your score is {}", self.score);
     }
 
     pub fn render(&mut self) {
@@ -108,8 +117,9 @@ impl Game {
     }
 
     fn calculate_interval(&self) -> Duration {
+        let speed = MAX_SPEED - self.speed;
         Duration::from_millis(
-            (BASE_INTERVAL_MS / MAX_SPEED) * (MAX_SPEED - (self.speed as u64))
+            (MIN_INTERVAL + (((MAX_INTERVAL - MIN_INTERVAL) / MAX_SPEED) * speed)) as u64
         )
     }
 
@@ -186,7 +196,12 @@ impl Game {
     }
 
     fn draw_snake(&mut self) {
-        self.stdout.execute(SetForegroundColor(Color::Green)).unwrap();
+        let fg = SetForegroundColor(match self.speed % 3 {
+            0 => Color::Green,
+            1 => Color::Yellow,
+            _ => Color::Blue
+        });
+        self.stdout.execute(fg).unwrap();
 
         for body in self.snake.get_body_points() {
             self.stdout
@@ -253,12 +268,12 @@ impl Game {
 
         self.stdout
             .execute(MoveTo(0, 0)).unwrap()
-            .execute(Print("+")).unwrap()
+            .execute(Print("#")).unwrap()
             .execute(MoveTo(self.width + 1, self.height + 1)).unwrap()
-            .execute(Print("+")).unwrap()
+            .execute(Print("#")).unwrap()
             .execute(MoveTo(self.width + 1, 0)).unwrap()
-            .execute(Print("+")).unwrap()
+            .execute(Print("#")).unwrap()
             .execute(MoveTo(0, self.height + 1)).unwrap()
-            .execute(Print("+")).unwrap();
+            .execute(Print("#")).unwrap();
     }
 }
