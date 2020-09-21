@@ -34,7 +34,16 @@ impl Game {
             width,
             height,
             food: None,
-            snake: Snake::new(Point::new(5, 5), 5, Direction::Right),
+            snake: Snake::new(
+                Point::new(width / 2, height / 2),
+                3,
+                match rand::thread_rng().gen_range(0, 4) {
+                    0 => Direction::Up,
+                    1 => Direction::Right,
+                    2 => Direction::Down,
+                    _ => Direction::Left
+                }
+            ),
             speed: 10,
         }
     }
@@ -43,15 +52,11 @@ impl Game {
         self.prepare_ui();
         self.place_food();
 
-        let mut quit = false;
-        loop {
-            if quit {
-                break;
-            }
-
-            let interval = self.calculate_interval();
+        let mut done = false;
+        while !done {
             let now = Instant::now();
-            let current_direction = self.snake.get_direction();
+            let interval = self.calculate_interval();
+            let direction = self.snake.get_direction();
 
             loop {
                 let elapsed = now.elapsed();
@@ -62,12 +67,12 @@ impl Game {
                 if let Some(command) = self.get_command(interval - elapsed) {
                     match command {
                         Command::Quit => {
-                            quit = true;
+                            done = true;
                             break;
                         }
-                        Command::Turn(direction) => {
-                            if current_direction != direction && current_direction.opposite() != direction {
-                                self.snake.set_direction(direction);
+                        Command::Turn(towards) => {
+                            if direction != towards && direction.opposite() != towards {
+                                self.snake.set_direction(towards);
                             }
                         }
                     }
@@ -75,26 +80,24 @@ impl Game {
             }
 
             if self.has_collided_with_wall() || self.has_bitten_itself() {
-                println!("Game over....");
-                quit = true;
-            }
+                done = true;
+            } else {
+                self.snake.slither();
 
-            self.snake.slither();
-
-            if let Some(food_point) = self.food {
-                if self.snake.get_head_point() == food_point {
-                    // add to end of snakes body
-                    self.snake.grow();
-                    // place food again
-                    self.place_food();
+                if let Some(food_point) = self.food {
+                    if self.snake.get_head_point() == food_point {
+                        self.snake.grow();
+                        self.place_food();
+                    }
                 }
-            }
-            // TODO check if snake has eaten food
 
-            self.render();
+                self.render();
+            }
         }
 
         self.restore_ui();
+
+        println!("Game Over! Your score is {}", self.snake.len());
     }
 
     pub fn render(&mut self) {
@@ -105,7 +108,9 @@ impl Game {
     }
 
     fn calculate_interval(&self) -> Duration {
-        Duration::from_millis((BASE_INTERVAL_MS / MAX_SPEED) * (MAX_SPEED - (self.speed as u64)))
+        Duration::from_millis(
+            (BASE_INTERVAL_MS / MAX_SPEED) * (MAX_SPEED - (self.speed as u64))
+        )
     }
 
     fn get_command(&self, wait_for: Duration) -> Option<Command> {
