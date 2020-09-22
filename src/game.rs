@@ -3,7 +3,7 @@ use crate::point::Point;
 use crate::direction::Direction;
 use std::io::Stdout;
 use crossterm::ExecutableCommand;
-use crossterm::terminal::{Clear, ClearType, size, SetSize};
+use crossterm::terminal::{Clear, ClearType, size, SetSize, enable_raw_mode, disable_raw_mode};
 use crossterm::style::{SetForegroundColor, Print, ResetColor, Color};
 use std::time::{Duration, Instant};
 use crossterm::cursor::{Show, MoveTo, Hide};
@@ -181,6 +181,7 @@ impl Game {
     }
 
     fn prepare_ui(&mut self) {
+        enable_raw_mode().unwrap();
         self.stdout
             .execute(SetSize(self.width + 3, self.height + 3)).unwrap()
             .execute(Clear(ClearType::All)).unwrap()
@@ -194,6 +195,7 @@ impl Game {
             .execute(Clear(ClearType::All)).unwrap()
             .execute(Show).unwrap()
             .execute(ResetColor).unwrap();
+        disable_raw_mode().unwrap();
     }
 
     fn draw_snake(&mut self) {
