@@ -6,13 +6,13 @@ pub struct Point {
 
 impl Point {
     pub fn new(x: u16, y: u16) -> Self {
-        Point { x, y }
+        Self { x, y }
     }
 
     pub fn apply_delta(&self, delta: (i16, i16)) -> Self {
-        Point::new(
-            Point::apply_delta_to_value(self.x, delta.0),
-            Point::apply_delta_to_value(self.y, delta.1)
+        Self::new(
+            Self::apply_delta_to_value(self.x, delta.0),
+            Self::apply_delta_to_value(self.y, delta.1)
         )
     }
 
