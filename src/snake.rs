@@ -5,7 +5,7 @@ use crate::point::Point;
 pub struct Snake {
     body: Vec<Point>,
     direction: Direction,
-    just_eaten: bool,
+    digesting: bool,
 }
 
 impl Snake {
@@ -16,7 +16,7 @@ impl Snake {
             .map(|i| start.apply_delta((delta.0 * (i as i16), delta.1 * (i as i16))))
             .collect();
 
-        Self { body, direction, just_eaten: false }
+        Self { body, direction, digesting: false }
     }
 
     pub fn get_head_point(&self) -> Point {
@@ -37,10 +37,10 @@ impl Snake {
 
     pub fn slither(&mut self) {
         self.body.insert(0, self.body.first().unwrap().apply_delta(self.direction.delta()));
-        if !self.just_eaten {
+        if !self.digesting {
             self.body.remove(self.body.len() - 1);
         } else {
-            self.just_eaten = false;
+            self.digesting = false;
         }
     }
 
@@ -51,6 +51,6 @@ impl Snake {
     }
 
     pub fn grow(&mut self) {
-        self.just_eaten = true;
+        self.digesting = true;
     }
 }

@@ -110,13 +110,6 @@ impl Game {
         println!("Game Over! Your score is {}", self.score);
     }
 
-    pub fn render(&mut self) {
-        self.draw_borders();
-        self.draw_background();
-        self.draw_food();
-        self.draw_snake();
-    }
-
     fn calculate_interval(&self) -> Duration {
         let speed = MAX_SPEED - self.speed;
         Duration::from_millis(
@@ -184,6 +177,13 @@ impl Game {
                 break;
             }
         }
+    }
+
+    fn render(&mut self) {
+        self.draw_borders();
+        self.draw_background();
+        self.draw_food();
+        self.draw_snake();
     }
 
     fn prepare_ui(&mut self) {
