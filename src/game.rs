@@ -7,7 +7,7 @@ use crossterm::terminal::{Clear, ClearType, size, SetSize, enable_raw_mode, disa
 use crossterm::style::{SetForegroundColor, Print, ResetColor, Color};
 use std::time::{Duration, Instant};
 use crossterm::cursor::{Show, MoveTo, Hide};
-use crossterm::event::{poll, read, Event, KeyCode};
+use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers};
 use crate::command::Command;
 use rand::Rng;
 
@@ -132,6 +132,12 @@ impl Game {
                         return match event.code {
                             KeyCode::Char('Q') => Some(Command::Quit),
                             KeyCode::Char('q') => Some(Command::Quit),
+                            KeyCode::Char('c') =>
+                                if event.modifiers == KeyModifiers::CONTROL {
+                                    Some(Command::Quit)
+                                } else {
+                                    None
+                                }
                             KeyCode::Esc => Some(Command::Quit),
                             KeyCode::Up => Some(Command::Turn(Direction::Up)),
                             KeyCode::Right => Some(Command::Turn(Direction::Right)),
