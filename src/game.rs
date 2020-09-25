@@ -57,15 +57,13 @@ impl Game {
         self.render();
 
         let mut done = false;
-        let speed_increase_mod = (self.width * self.height) / MAX_SPEED;
         while !done {
             let interval = self.calculate_interval();
             let direction = self.snake.get_direction();
             let now = Instant::now();
-            let mut elapsed = now.elapsed();
 
-            while elapsed < interval {
-                if let Some(command) = self.get_command(interval - elapsed) {
+            while now.elapsed() < interval {
+                if let Some(command) = self.get_command(interval - now.elapsed()) {
                     match command {
                         Command::Quit => {
                             done = true;
@@ -78,8 +76,6 @@ impl Game {
                         }
                     }
                 }
-
-                elapsed = now.elapsed();
             }
 
             if self.has_collided_with_wall() || self.has_bitten_itself() {
@@ -94,7 +90,7 @@ impl Game {
                         self.score += 1;
 
 
-                        if self.score % speed_increase_mod == 0 {
+                        if self.score % ((self.width * self.height) / MAX_SPEED) == 0 {
                             self.speed += 1;
                         }
                     }
