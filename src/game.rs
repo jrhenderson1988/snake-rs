@@ -11,7 +11,7 @@ use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers};
 use crate::command::Command;
 use rand::Rng;
 
-const MAX_INTERVAL: u16 = 750;
+const MAX_INTERVAL: u16 = 700;
 const MIN_INTERVAL: u16 = 200;
 const MAX_SPEED: u16 = 20;
 
