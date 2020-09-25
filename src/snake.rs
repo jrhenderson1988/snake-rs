@@ -45,9 +45,7 @@ impl Snake {
     }
 
     pub fn set_direction(&mut self, direction: Direction) {
-        if direction != self.direction.opposite() {
-            self.direction = direction;
-        }
+        self.direction = direction;
     }
 
     pub fn grow(&mut self) {
