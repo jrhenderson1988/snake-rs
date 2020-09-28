@@ -118,15 +118,13 @@ impl Game {
             if let Ok(event) = read() {
                 if let Event::Key(event) = event {
                     return match event.code {
-                        KeyCode::Char('Q') => Some(Command::Quit),
-                        KeyCode::Char('q') => Some(Command::Quit),
-                        KeyCode::Char('c') =>
+                        KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
+                        KeyCode::Char('c') | KeyCode::Char('C') =>
                             if event.modifiers == KeyModifiers::CONTROL {
                                 Some(Command::Quit)
                             } else {
                                 None
                             }
-                        KeyCode::Esc => Some(Command::Quit),
                         KeyCode::Up => Some(Command::Turn(Direction::Up)),
                         KeyCode::Right => Some(Command::Turn(Direction::Right)),
                         KeyCode::Down => Some(Command::Turn(Direction::Down)),
