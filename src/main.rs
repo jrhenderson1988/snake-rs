@@ -1,5 +1,3 @@
-extern crate rand;
-
 mod snake;
 mod direction;
 mod game;

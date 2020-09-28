@@ -89,7 +89,6 @@ impl Game {
                         self.place_food();
                         self.score += 1;
 
-
                         if self.score % ((self.width * self.height) / MAX_SPEED) == 0 {
                             self.speed += 1;
                         }
@@ -101,7 +100,6 @@ impl Game {
         }
 
         self.restore_ui();
-
 
         println!("Game Over! Your score is {}", self.score);
     }
