@@ -114,27 +114,25 @@ impl Game {
     }
 
     fn get_command(&self, wait_for: Duration) -> Option<Command> {
-        if let Ok(occurred) = poll(wait_for) {
-            if occurred {
-                if let Ok(event) = read() {
-                    if let Event::Key(event) = event {
-                        return match event.code {
-                            KeyCode::Char('Q') => Some(Command::Quit),
-                            KeyCode::Char('q') => Some(Command::Quit),
-                            KeyCode::Char('c') =>
-                                if event.modifiers == KeyModifiers::CONTROL {
-                                    Some(Command::Quit)
-                                } else {
-                                    None
-                                }
-                            KeyCode::Esc => Some(Command::Quit),
-                            KeyCode::Up => Some(Command::Turn(Direction::Up)),
-                            KeyCode::Right => Some(Command::Turn(Direction::Right)),
-                            KeyCode::Down => Some(Command::Turn(Direction::Down)),
-                            KeyCode::Left => Some(Command::Turn(Direction::Left)),
-                            _ => None
-                        };
-                    }
+        if let Ok(true) = poll(wait_for) {
+            if let Ok(event) = read() {
+                if let Event::Key(event) = event {
+                    return match event.code {
+                        KeyCode::Char('Q') => Some(Command::Quit),
+                        KeyCode::Char('q') => Some(Command::Quit),
+                        KeyCode::Char('c') =>
+                            if event.modifiers == KeyModifiers::CONTROL {
+                                Some(Command::Quit)
+                            } else {
+                                None
+                            }
+                        KeyCode::Esc => Some(Command::Quit),
+                        KeyCode::Up => Some(Command::Turn(Direction::Up)),
+                        KeyCode::Right => Some(Command::Turn(Direction::Right)),
+                        KeyCode::Down => Some(Command::Turn(Direction::Down)),
+                        KeyCode::Left => Some(Command::Turn(Direction::Left)),
+                        _ => None
+                    };
                 }
             }
         }
