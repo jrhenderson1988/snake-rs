@@ -10,10 +10,10 @@ pub struct Snake {
 
 impl Snake {
     pub fn new(start: Point, length: u16, direction: Direction) -> Self {
-        let delta = direction.opposite().delta();
+        let opposite = direction.opposite();
         let body: Vec<Point> = (0..length)
             .into_iter()
-            .map(|i| start.apply_delta((delta.0 * (i as i16), delta.1 * (i as i16))))
+            .map(|i| start.transform(opposite, i))
             .collect();
 
         Self { body, direction, digesting: false }
@@ -36,7 +36,7 @@ impl Snake {
     }
 
     pub fn slither(&mut self) {
-        self.body.insert(0, self.body.first().unwrap().apply_delta(self.direction.delta()));
+        self.body.insert(0, self.body.first().unwrap().transform(self.direction, 1));
         if !self.digesting {
             self.body.remove(self.body.len() - 1);
         } else {

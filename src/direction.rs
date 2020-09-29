@@ -15,13 +15,4 @@ impl Direction {
             Self::Left => Self::Right,
         }
     }
-
-    pub fn delta(&self) -> (i16, i16) {
-        match self {
-            Self::Up => (0, -1),
-            Self::Right => (1, 0),
-            Self::Down => (0, 1),
-            Self::Left => (-1, 0),
-        }
-    }
 }

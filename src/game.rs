@@ -148,13 +148,12 @@ impl Game {
     }
 
     fn has_bitten_itself(&self) -> bool {
-        let delta = self.snake.get_direction().delta();
-        let next_head_point = self.snake.get_head_point().apply_delta(delta);
-        let mut body_points = self.snake.get_body_points().clone();
-        body_points.remove(body_points.len() - 1);
-        body_points.remove(0);
+        let next_head_point = self.snake.get_head_point().transform(self.snake.get_direction(), 1);
+        let mut next_body_points = self.snake.get_body_points().clone();
+        next_body_points.remove(next_body_points.len() - 1);
+        next_body_points.remove(0);
 
-        body_points.contains(&next_head_point)
+        next_body_points.contains(&next_head_point)
     }
 
     fn place_food(&mut self) {
@@ -213,10 +212,10 @@ impl Game {
                     } else if previous.y == next.y {
                         '═'
                     } else {
-                        let d = body.apply_delta((0, 1));
-                        let r = body.apply_delta((1, 0));
-                        let u = if body.y == 0 { body.clone() } else { body.apply_delta((0, -1)) };
-                        let l = if body.x == 0 { body.clone() } else { body.apply_delta((-1, 0)) };
+                        let d = body.transform(Direction::Down, 1);
+                        let r = body.transform(Direction::Right, 1);
+                        let u = if body.y == 0 { body.clone() } else { body.transform(Direction::Up, 1) };
+                        let l = if body.x == 0 { body.clone() } else { body.transform(Direction::Left, 1) };
                         if (next == d && previous == r) || (previous == d && next == r) {
                             '╔'
                         } else if (next == d && previous == l) || (previous == d && next == l) {
