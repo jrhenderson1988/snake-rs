@@ -6,4 +6,4 @@ The game is terminal based and uses [Crossterm](https://github.com/crossterm-rs/
 
 ## License
 
-This project is open-source and licensed under the MIT License. See [here](https://github.com/jrhenderson1988/snake-rs/LICENSE) for more details.
+This project is open-source and licensed under the MIT License. See [here](https://github.com/jrhenderson1988/snake-rs/blob/master/LICENSE) for more details.
