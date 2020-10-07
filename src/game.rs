@@ -2,12 +2,12 @@ use crate::snake::Snake;
 use crate::point::Point;
 use crate::direction::Direction;
 use std::io::Stdout;
-use crossterm::ExecutableCommand;
+use crossterm::{ExecutableCommand};
 use crossterm::terminal::{Clear, ClearType, size, SetSize, enable_raw_mode, disable_raw_mode};
 use crossterm::style::{SetForegroundColor, Print, ResetColor, Color};
 use std::time::{Duration, Instant};
 use crossterm::cursor::{Show, MoveTo, Hide};
-use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers};
+use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers, KeyEvent};
 use crate::command::Command;
 use rand::Rng;
 
@@ -111,25 +111,32 @@ impl Game {
         )
     }
 
+    fn wait_for_key_event(&self, wait_for: Duration) -> Option<KeyEvent> {
+        if poll(wait_for).ok()? {
+            let event = read().ok()?;
+            if let Event::Key(key_event) = event {
+                return Some(key_event);
+            }
+        }
+
+        None
+    }
+
     fn get_command(&self, wait_for: Duration) -> Option<Command> {
-        if let Ok(true) = poll(wait_for) {
-            if let Ok(event) = read() {
-                if let Event::Key(event) = event {
-                    return match event.code {
-                        KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
-                        KeyCode::Char('c') | KeyCode::Char('C') =>
-                            if event.modifiers == KeyModifiers::CONTROL {
-                                Some(Command::Quit)
-                            } else {
-                                None
-                            }
-                        KeyCode::Up => Some(Command::Turn(Direction::Up)),
-                        KeyCode::Right => Some(Command::Turn(Direction::Right)),
-                        KeyCode::Down => Some(Command::Turn(Direction::Down)),
-                        KeyCode::Left => Some(Command::Turn(Direction::Left)),
-                        _ => None
-                    };
-                }
+        if let Some(key_event) = self.wait_for_key_event(wait_for) {
+            return match key_event.code {
+                KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
+                KeyCode::Char('c') | KeyCode::Char('C') =>
+                    if key_event.modifiers == KeyModifiers::CONTROL {
+                        Some(Command::Quit)
+                    } else {
+                        None
+                    }
+                KeyCode::Up => Some(Command::Turn(Direction::Up)),
+                KeyCode::Right => Some(Command::Turn(Direction::Right)),
+                KeyCode::Down => Some(Command::Turn(Direction::Down)),
+                KeyCode::Left => Some(Command::Turn(Direction::Left)),
+                _ => None
             }
         }
 
