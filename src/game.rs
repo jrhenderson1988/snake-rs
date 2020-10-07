@@ -123,24 +123,22 @@ impl Game {
     }
 
     fn get_command(&self, wait_for: Duration) -> Option<Command> {
-        if let Some(key_event) = self.wait_for_key_event(wait_for) {
-            return match key_event.code {
-                KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
-                KeyCode::Char('c') | KeyCode::Char('C') =>
-                    if key_event.modifiers == KeyModifiers::CONTROL {
-                        Some(Command::Quit)
-                    } else {
-                        None
-                    }
-                KeyCode::Up => Some(Command::Turn(Direction::Up)),
-                KeyCode::Right => Some(Command::Turn(Direction::Right)),
-                KeyCode::Down => Some(Command::Turn(Direction::Down)),
-                KeyCode::Left => Some(Command::Turn(Direction::Left)),
-                _ => None
-            }
-        }
+        let key_event = self.wait_for_key_event(wait_for)?;
 
-        None
+        match key_event.code {
+            KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
+            KeyCode::Char('c') | KeyCode::Char('C') =>
+                if key_event.modifiers == KeyModifiers::CONTROL {
+                    Some(Command::Quit)
+                } else {
+                    None
+                }
+            KeyCode::Up => Some(Command::Turn(Direction::Up)),
+            KeyCode::Right => Some(Command::Turn(Direction::Right)),
+            KeyCode::Down => Some(Command::Turn(Direction::Down)),
+            KeyCode::Left => Some(Command::Turn(Direction::Left)),
+            _ => None
+        }
     }
 
     fn has_collided_with_wall(&self) -> bool {
